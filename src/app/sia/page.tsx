@@ -3,9 +3,24 @@ import axios from 'axios';
 import Image from 'next/image'
 import Link from 'next/link'
 import { ThaiFormatDate } from '../../../utils/date';
+import { useEffect, useState } from 'react';
 
 export default async function Home() {
-  const roundResult = await getRound();
+  const [roundResult, setRoundResult] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchRound = async () => {
+      try {
+        const basePath = process.env.NEXT_PUBLIC_VERCEL_URL
+        const roundListingUrl = `${basePath}/api/sia/lists/round`;
+        const response = await axios.get(roundListingUrl);
+        setRoundResult(response?.data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+    fetchRound()
+  }, [])
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
@@ -17,7 +32,7 @@ export default async function Home() {
           By [L]ove[O]n|y
         </div>
       </div>
-      {roundResult?.data?.data?.auctionRounds?.length > 0 && <Round auctionRound={roundResult?.data?.data?.auctionRounds}></Round>}
+      {roundResult?.data?.auctionRounds?.length > 0 && <Round auctionRound={roundResult?.data?.auctionRounds}></Round>}
 
 
       <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
@@ -78,20 +93,3 @@ const RoundLinkBadge = (props: { roundNumber: number, key: number, auctionDate: 
   )
 }
 
-const getRound = async () => {
-  const basePath = process.env.NEXT_PUBLIC_VERCEL_URL
-  const roundListingUrl = `${basePath}/api/sia/lists/round`;
-
-  try {
-    const response = await axios.get(roundListingUrl);
-    return {
-      data: response.data
-    }
-  } catch (error: any) {
-    console.log(JSON.stringify(error))
-    error.response && console.log(error.response);
-    return {
-      error: JSON.stringify(error)
-    }
-  }
-}
