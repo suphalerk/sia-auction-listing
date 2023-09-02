@@ -1,15 +1,11 @@
 "use client"
 import axios from 'axios';
 import Image from 'next/image'
-import { useEffect, use } from 'react';
 import Link from 'next/link'
 import { ThaiFormatDate } from '../../../utils/date';
 
-export default function Home() {
-
-
-  const roundResult = use(getRound());
-  console.log("dd", roundResult?.data?.data?.auctionRounds)
+export default async function Home() {
+  const roundResult = await getRound();
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
