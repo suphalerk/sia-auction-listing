@@ -1,0 +1,78 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model AuctionRound {
+  id              Int       @id @default(autoincrement())
+  roundNumber     Int       @unique
+  auctionDate     DateTime
+  auctionUpdateAt DateTime?
+  createdAt       DateTime  @default(now())
+
+  AuctionStage   AuctionStage[]
+  AuctionProduct AuctionProduct[]
+}
+
+model AuctionStage {
+  id             Int      @id @default(autoincrement())
+  auctionRoundId Int
+  stageId        Int      @unique
+  stageNumber    Int
+  stageLocation  String?
+  stageType      String?
+  depositAmount  Int?
+  tagPerUser     Int?
+  eventType      String?
+  invoiceType    String?
+  status         String?
+  createdAt      DateTime @default(now())
+
+  AuctionRound   AuctionRound     @relation(fields: [auctionRoundId], references: [id])
+  AuctionProduct AuctionProduct[]
+}
+
+model AuctionProduct {
+  id                     Int     @id @default(autoincrement())
+  auctionStageId         Int
+  auctionRoundId         Int
+  productId              Int // NO
+  productNo              String? // PRODUCT_NO
+  chassisNo              String? // PRODUCT_NO_CHASSIS
+  engineNo               String? // PRODUCT_NO_ENGINE
+  name                   String? // PRODUCT_NAME
+  brand                  String? // PRODUCT_BRAND
+  generation             String? // PRODUCT_GENERATION
+  gear                   String? // PRODUCT_GEAR
+  year                   String? // PRODUCT_YEAR
+  color                  String? // PRODUCT_COLOR
+  engineCapacity         String? // PRODUCT_CC
+  mileage                Int? // PRODUCT_MILEAGE
+  vehicleType            String? // PRODUCT_CATEGORY
+  subVehicleType         String? // PRODUCT_CATEGORY_SUB
+  note                   String? // PRODUCT_NOTE
+  productStatus          String? // STATUS
+  priceStart             Int? // PRICE_START
+  priceService           Int? // PRICE_SERVICE
+  priceTransport         Int? // PRICE_TRANSPORT
+  licensePlate           String? // PRODUCT_REGISTRATION
+  licensePlateProvince   String? // PRODUCT_PROVINCE
+  licensePlateExpireDate String? // PRODUCT_DATE_TAX
+  productImageCode       String? // NF_PRODUCT_PICTURE
+  productImageServer     String? // PICTURE_SERVER
+  grade                  String? // PRODUCT_GRADE
+  nfLotId                Int? // NF_LOT_ID
+  caregId                Int? // PRODUCT_CAREG_ID
+
+  AuctionStage AuctionStage @relation(fields: [auctionStageId], references: [id])
+  AuctionRound AuctionRound @relation(fields: [auctionRoundId], references: [id])
+
+  @@unique([auctionRoundId, productId])
+}
